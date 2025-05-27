@@ -9,7 +9,7 @@ set(CMAKE_BUILD_TYPE Release)
 project(cuda_test LANGUAGES CXX CUDA)
 
 # 添加src目录下源文件
-file(GLOB_RECURSE SOURCES "./src/test.cu")
+file(GLOB_RECURSE SOURCES "./src/add/add.cu")
 
 # 添加可执行文件
-add_executable(cuda_test ${SOURCES})
+ add_executable(cuda_test ${SOURCES})

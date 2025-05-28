@@ -21,7 +21,8 @@ rm -rf "$BUILD_DIR"
 # 配置项目
 cmake -B "$BUILD_DIR" \
   -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_CUDA_ARCHITECTURES=$CUDA_ARCH
+  -DCMAKE_CUDA_ARCHITECTURES=$CUDA_ARCH \
+  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
 # 构建项目
 cmake --build "$BUILD_DIR" -- -j$(nproc)

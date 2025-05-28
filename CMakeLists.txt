@@ -12,3 +12,10 @@ endif()
 
 file(GLOB_RECURSE SOURCES "./src/add/add.cu")
 add_executable(cuda_test ${SOURCES})
+
+add_custom_target(
+  copy_database_compile_commands ALL
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${PROJECT_BINARY_DIR}/compile_commands.json
+  ${PROJECT_SOURCE_DIR}/compile_commands.json
+)

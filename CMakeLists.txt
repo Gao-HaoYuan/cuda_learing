@@ -8,6 +8,15 @@ set(CMAKE_BUILD_TYPE Release)
 
 project(cuda_test LANGUAGES CXX CUDA)
 
+## CUDA架构代码说明（根据GPU型号选择对应的代码）
+# 60 - Pascal (GTX 10xx)
+# 70 - Volta
+# 75 - Turing (RTX 20xx)
+# 80 - Ampere (RTX 30xx)
+# 86 - Ampere (部分 30xx)
+# 90 - Hopper (最新架构)
+set(CUDA_ARCHITECTURES 80)
+
 # 添加src目录下源文件
 file(GLOB_RECURSE SOURCES "./src/add/add.cu")
 

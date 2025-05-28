@@ -19,12 +19,13 @@ CUDA_ARCH=80
 rm -rf "$BUILD_DIR"
 
 # 配置项目
-cmake -B "$BUILD_DIR" \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_CUDA_ARCHITECTURES=$CUDA_ARCH \
-  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+CMAKE_COMMAND="-B "$BUILD_DIR" \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_CUDA_ARCHITECTURES=$CUDA_ARCH \
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
 
 # 构建项目
+cmake ${CMAKE_COMMAND} .
 cmake --build "$BUILD_DIR" -- -j$(nproc)
 
 # 运行生成的可执行文件（如果存在）

@@ -17,7 +17,7 @@ if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
     set(CMAKE_CUDA_ARCHITECTURES 80)
 endif()
 
-file(GLOB_RECURSE SOURCES "./src/graph/graph.cu")
+file(GLOB_RECURSE SOURCES "./src/p2p/check.cu")
 add_executable(cuda_test ${SOURCES})
 target_include_directories(cuda_test PRIVATE ${CUDA_HOME}/include())
 

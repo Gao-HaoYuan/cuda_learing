@@ -15,3 +15,6 @@
 是 NVIDIA 官方的 demo，以 submodule 的形式导入
 
 <h4> pytorch 用于测试并优化相关模型性能 </h4>
+pytorch profiler 工具，export_stacks 生成空文件，这个是一个 bug，pytorch 官方还未修复
+
+参考 issues : [100253](https://github.com/pytorch/pytorch/issues/100253)

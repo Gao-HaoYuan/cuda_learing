@@ -1,5 +1,5 @@
-<h4> 该 Repo 用于 Cuda 学习测试 </h4>
-测试 demo 位于 src
+<h3> Overview </h3>
+该 Repo 主要用来学习 CUDA 开发，最终应用场景是优化模型训练和推理，cuda 代码的测试 demo 位于 src 文件中
 
 <h4> c_to_python </h4>
 存在 c/cu to python 的需求，因此增加 c_to_python 的文件夹，来模拟整个流程，注意：
@@ -13,3 +13,5 @@
 
 <h4> cuda-smaples </h4>
 是 NVIDIA 官方的 demo，以 submodule 的形式导入
+
+<h4> pytorch 用于测试并优化相关模型性能 </h4>

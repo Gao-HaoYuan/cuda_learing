@@ -1,5 +1,6 @@
 // hello.c
 #include <Python.h>
+#include <stdio.h>
 
 // 这是一个简单的加法函数
 static PyObject* py_add(PyObject* self, PyObject* args) {

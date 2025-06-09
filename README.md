@@ -14,7 +14,29 @@
 <h4> cuda-smaples </h4>
 是 NVIDIA 官方的 demo，以 submodule 的形式导入
 
-<h4> pytorch 用于测试并优化相关模型性能 </h4>
+<h4> pytorch profiler </h4>
 pytorch profiler 工具，export_stacks 生成空文件，这个是一个 bug，pytorch 官方还未修复
 
 参考 issues : [100253](https://github.com/pytorch/pytorch/issues/100253)
+
+<h4> c_to_pytorch </h4>
+该目录演示了怎么为 pytorch 添加一个拓展，需要用到 <mark>PYBIND11_MODULE</mark>
+
+- 具体用法参考 : [pybind11](https://pybind11.readthedocs.io/en/stable/classes.html)
+
+同时，注意 .cpp 和 .cu 文件不要同名，如下面的编译方法会报错，因为 add.cpp/add.cu 编译都会生成 add.o，上一个文件的符号会被覆盖，所以会有一些奇奇怪怪的错误，**推荐使用 make 编译，而且文件命名的时候最好也体现出他的功能，算是一种开发规范**
+
+``` python
+# 错误代码演示
+no_make = CUDAExtension(
+                    name="my_add",
+                    sources=["./my_add/add.cpp", "./my_add/add.cu"],
+                    include_dirs=["./my_add"]
+                  )
+
+setup(
+    name ="my_add",
+    ext_modules = [no_make],
+    cmdclass = {"build_ext": BuildExtension}
+)
+```

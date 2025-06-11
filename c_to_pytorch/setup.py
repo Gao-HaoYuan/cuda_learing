@@ -8,7 +8,8 @@ from torch.utils.cpp_extension import BuildExtension, CUDAExtension
 
 class BuildHaste(BuildExtension):
   def run(self):
-    os.system('make my_add LIBNAME=libmy_add.a')
+    # os.system('make my_add LIBNAME=libmy_add.a')
+    os.system('bash ./build.sh')
     super().run()
 
 base_path = os.path.dirname(os.path.realpath(__file__))
@@ -25,7 +26,7 @@ have_make = CUDAExtension(
                     include_dirs=[os.path.join(base_path, './')],
                     extra_compile_args = extra_args,
                     libraries = ['my_add'],
-                    library_dirs = ['.']
+                    library_dirs = ['./lib']
                   )
 
 setup(

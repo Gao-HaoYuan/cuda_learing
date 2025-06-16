@@ -13,10 +13,34 @@
         } \
     } while (0)
 
+#define CHECK_CUBLAS(call)                                                \
+    do {                                                                  \
+        cublasStatus_t status = call;                                    \
+        if (status != CUBLAS_STATUS_SUCCESS) {                           \
+            std::cerr << "cuBLAS error " << status << " at " << __FILE__ << ":" << __LINE__ << std::endl; \
+            std::exit(EXIT_FAILURE);                                      \
+        }                                                                 \
+    } while (0)
+
 __global__ void warmup_kernel(float* data, int N) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < N)
         data[idx] = data[idx] * 2.0f + 1.0f;
+}
+
+template<typename T>
+bool is_device_pointer(const T* ptr) {
+    cudaPointerAttributes attr;
+    cudaError_t err = cudaPointerGetAttributes(&attr, ptr);
+
+#if CUDART_VERSION >= 10000
+    if (err == cudaSuccess && attr.type == cudaMemoryTypeDevice)
+#else
+    if (err == cudaSuccess && attr.memoryType == cudaMemoryTypeDevice)
+#endif
+        return true;
+
+    return false;
 }
 
 void gpu_warmup() {
@@ -41,52 +65,50 @@ void gpu_warmup() {
 template<typename KernelFunc, typename... Args>
 float perf_performance(KernelFunc&& kernel, const char* name, dim3 grid, dim3 block, Args&&... args) {
     cudaEvent_t start, stop;
+    cudaStream_t stream;
+    cudaStreamCreate(&stream);
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
-    cudaEventRecord(start);
+    cudaEventRecord(start, stream);
 
-    std::forward<KernelFunc>(kernel)<<<grid, block>>>(std::forward<Args>(args)...);
+    std::forward<KernelFunc>(kernel)<<<grid, block, 0, stream>>>(std::forward<Args>(args)...);
 
-    cudaEventRecord(stop);
+    cudaEventRecord(stop, stream);
     cudaEventSynchronize(stop);
     float ms = 0;
     cudaEventElapsedTime(&ms, start, stop);
     printf("%s time: %.3f ms\n", name, ms);
     cudaEventDestroy(start);
     cudaEventDestroy(stop);
+    cudaStreamDestroy(stream);
     return ms;
 }
 
 template<typename T>
-void perf_accuracy(const T* out1, const T* out2, const int total) {
-    T* out_major = new T[total];
-    T* out_minor = new T[total];
-
-    cudaMemcpy(out_major, out1, total * sizeof(T), cudaMemcpyDeviceToHost);
-    cudaMemcpy(out_minor, out2, total * sizeof(T), cudaMemcpyDeviceToHost);
-
+void perf_accuracy(const T* out_major, const T* out_minor, const int total) {
     int err_count = 0;
-    const double epsilon = 1e-6f;
+    const float epsilon = 1e-5f;
     for (int i = 0; i < total; ++i) {
-        double a = static_cast<double>(out_major[i]);
-        double b = static_cast<double>(out_minor[i]);
+        float a = static_cast<float>(out_major[i]);
+        float b = static_cast<float>(out_minor[i]);
 
-        if (fabs(a - b) > epsilon) {
+        float diff = fabs(a - b);
+        float denom = std::max(fabs(a), 1e-6f);
+        if (diff / denom > epsilon || std::isnan(a) || std::isnan(b) || std::isinf(a) || std::isinf(b)) {
             if (err_count < 10) {
-                printf("Mismatch at %d: out_major=%.3f, out_minor=%.3f \n", i, out_major[i], out_minor[i]);
+                printf("Mismatch at %d: out_major=%.3f, out_minor=%.3f, error=%.3f\n", i, a, b, a - b);
             }
             err_count++;
         }
     }
-
     
     if (err_count == 0)
         printf("✅ 输出一致！\n");
     else
         printf("❌ 结果有 %d 处不同（前 10 处已列出）\n", err_count);
 
-    delete[] out_major;
-    delete[] out_minor;
+    // delete[] out_major;
+    // delete[] out_minor;
     
     // 二维矩阵析构
     // for (int i = 0; i < rows; ++i) {

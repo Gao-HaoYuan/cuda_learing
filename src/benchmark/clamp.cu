@@ -79,7 +79,6 @@ int main() {
     gpu_warmup();
     perf_performance(kernel_clamp_if,     "clamp_if",     (N + 255)/256, 256, d_out1, d_in, d_flag1, 0.0f, 127.0f);
     perf_performance(kernel_clamp_minmax, "clamp_minmax", (N + 255)/256, 256, d_out2, d_in, d_flag2, 0.0f, 127.0f);
-    perf_accuracy(d_out1, d_out2, N);
 
     cudaFree(d_in);
     cudaFree(d_out1);

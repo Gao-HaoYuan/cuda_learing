@@ -1,4 +1,5 @@
 #include <vector>
+#include <random>
 
 #include "perf.h"
 
@@ -71,79 +72,66 @@ __global__ void bit_matmul_3d_kernel(
     }
 }
 
+int main() {
+    // 矩阵尺寸定义
+    const int M = 2048;
+    const int K = 4096;
+    const int N = 1040;
+    const int B = 14;
 
-
-
-// 初始化函数
-void init_and_run(int m, int n, int k, int bit_nums) {
-    int size_a = bit_nums * m * k;
-    int size_b = bit_nums * k * n;
-    int size_w = bit_nums * bit_nums;
-    int size_c = m * n;
-
-    // 分配 host 内存
-    std::vector<int8_t> h_a(size_a);
-    std::vector<float> h_b(size_b);
-    std::vector<float> h_w(size_w);
-    std::vector<float> h_c(size_c, 0.0f);
+    // Host-side data
+    std::vector<int8_t> h_A(B * M * K);
+    std::vector<float> h_B(B * K * N);
+    std::vector<float> h_W(B * B);
+    std::vector<float> h_C(M * N, 0.f);
 
     // 随机初始化
-    for (auto& v : h_a) v = rand() % 2;
-    for (auto& v : h_b) v = static_cast<float>(rand() % 100) / 100.0f;
-    for (auto& v : h_w) v = static_cast<float>(rand() % 100) / 100.0f;
+    std::mt19937 rng(123);
+    std::uniform_real_distribution<float> dist(0.f, 1.f);
+    for (auto& x : h_A) x = 2.0;
+    for (auto& x : h_B) x = 4.0;
+    for (auto& x : h_W) x = 3.0;
 
-    // 分配 device 内存
-    int8_t* d_a;
-    float* d_b;
-    float* d_w;
-    float* d_c;
-    CHECK_CUDA(cudaMalloc(&d_a, size_a * sizeof(int8_t)));
-    CHECK_CUDA(cudaMalloc(&d_b, size_b * sizeof(float)));
-    CHECK_CUDA(cudaMalloc(&d_w, size_w * sizeof(float)));
-    CHECK_CUDA(cudaMalloc(&d_c, size_c * sizeof(float)));
+    // 设备内存分配
+    int8_t *A_d;
+    float *B_d, *C_d, *W_d;
+    CHECK_CUDA(cudaMalloc(&A_d, B * M * K * sizeof(int8_t)));
+    CHECK_CUDA(cudaMalloc(&B_d, B * K * N * sizeof(float)));
+    CHECK_CUDA(cudaMalloc(&W_d, B * B * sizeof(float)));
+    CHECK_CUDA(cudaMalloc(&C_d, M * N * sizeof(float)));
 
-    // 拷贝到 device
-    CHECK_CUDA(cudaMemcpy(d_a, h_a.data(), size_a * sizeof(int8_t), cudaMemcpyHostToDevice));
-    CHECK_CUDA(cudaMemcpy(d_b, h_b.data(), size_b * sizeof(float), cudaMemcpyHostToDevice));
-    CHECK_CUDA(cudaMemcpy(d_w, h_w.data(), size_w * sizeof(float), cudaMemcpyHostToDevice));
+    // 拷贝到设备
+    CHECK_CUDA(cudaMemcpy(A_d, h_A.data(), B * M * K * sizeof(int8_t), cudaMemcpyHostToDevice));
+    CHECK_CUDA(cudaMemcpy(B_d, h_B.data(), B * K * N * sizeof(float), cudaMemcpyHostToDevice));
+    CHECK_CUDA(cudaMemcpy(W_d, h_W.data(), B * B * sizeof(float), cudaMemcpyHostToDevice));
+    CHECK_CUDA(cudaMemset(C_d, 0, M * N * sizeof(float))); // 清零 C_d
 
-    // 设置 block 和 grid 尺寸（32×32 block）
     dim3 blockDim(32, 32);
-    dim3 gridDim((n + 31) / 32, (m + 31) / 32);
+    dim3 gridDim((N + 31) / 32, (M + 31) / 32);
 
-    // 调用 kernel
+    // warm up
     gpu_warmup();
-    perf_performance(bit_matmul_3d_kernel, "origin gemm", gridDim, blockDim, d_a, d_b, d_w, d_c, m, n, k, bit_nums);
-    CHECK_CUDA(cudaGetLastError());
-    CHECK_CUDA(cudaDeviceSynchronize());
 
-    // 拷贝结果回 host
-    CHECK_CUDA(cudaMemcpy(h_c.data(), d_c, size_c * sizeof(float), cudaMemcpyDeviceToHost));
+    perf_performance(bit_matmul_3d_kernel, "origin matmul", gridDim, blockDim, A_d, B_d, W_d, C_d, M, N, K, B);
 
-    // 简单验证输出（打印前 5×5）
-    std::cout << "Output C (first 5x5 block):" << std::endl;
-    for (int i = 0; i < std::min(m, 5); ++i) {
-        for (int j = 0; j < std::min(n, 5); ++j) {
-            std::cout << h_c[i * n + j] << "\t";
+    // 拷贝结果回 CPU
+    CHECK_CUDA(cudaMemcpy(h_C.data(), C_d, M * N * sizeof(float), cudaMemcpyDeviceToHost));
+    cudaDeviceSynchronize();
+
+    // 打印 C 的前 5x5 矩阵
+    std::cout << "C matrix (2x2 block):" << std::endl;
+    for (int i = 0; i < 2; ++i) {
+        for (int j = 0; j < 2; ++j) {
+            std::cout << h_C[i * N + j] << "\t";
         }
-        std::cout << "\n";
+        std::cout << std::endl;
     }
 
-    // 清理
-    CHECK_CUDA(cudaFree(d_a));
-    CHECK_CUDA(cudaFree(d_b));
-    CHECK_CUDA(cudaFree(d_w));
-    CHECK_CUDA(cudaFree(d_c));
-}
-
-int main() {
-    // 示例输入维度
-    int m = 512;
-    int n = 512;
-    int k = 1024;
-    int bit_nums = 16;
-
-    init_and_run(m, n, k, bit_nums);
+    // 释放资源
+    CHECK_CUDA(cudaFree(A_d));
+    CHECK_CUDA(cudaFree(B_d));
+    CHECK_CUDA(cudaFree(C_d));
+    CHECK_CUDA(cudaFree(W_d));
 
     return 0;
 }

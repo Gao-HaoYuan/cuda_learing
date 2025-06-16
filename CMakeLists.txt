@@ -47,12 +47,18 @@ link_directories(
 
 # Add source file
 file(GLOB_RECURSE SOURCES
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/gemm.cu"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/blas.cu"
 )
 add_executable(${EXEC_NAME} ${SOURCES})
 target_include_directories(${EXEC_NAME} 
   PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/benchmark/include
+)
+
+target_link_libraries(${EXEC_NAME} 
+    PRIVATE 
+    cudart
+    cublas
 )
 
 add_custom_target(

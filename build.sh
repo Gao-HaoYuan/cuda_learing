@@ -37,3 +37,4 @@ cmake --build "$BUILD_DIR" -- -j$(nproc)
 EXEC_PATH="$BUILD_DIR/$EXEC_NAME"
 echo "---------------------------------------------------------"
 "$EXEC_PATH"
+# ncu --set full --target-processes all -o my_report -f "$EXEC_PATH"

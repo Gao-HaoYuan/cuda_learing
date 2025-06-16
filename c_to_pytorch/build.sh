@@ -14,7 +14,8 @@ if [ ! -d "$BUILD_DIR" ]; then
     mkdir "$BUILD_DIR"
 fi
 
-CMAKE_COMMAND="-B $BUILD_DIR \
+CMAKE_COMMAND="-G Ninja \
+            -B $BUILD_DIR \
             -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
             -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
             -DCMAKE_CUDA_ARCHITECTURES=$CUDA_ARCH \
@@ -23,6 +24,10 @@ CMAKE_COMMAND="-B $BUILD_DIR \
 
 cmake ${CMAKE_COMMAND} .
 # make library
+pushd .
 cd "$BUILD_DIR"
-make VERBOSE=1 -j$(nproc)
-make install
+# make library
+# make VERBOSE=1 -j$(nproc)
+# make install
+ninja install -v
+popd

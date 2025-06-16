@@ -1,5 +1,17 @@
-#include <stdio.h>
+#pragma once
+
+#include <iostream>
 #include <cuda_runtime.h>
+
+#define CHECK_CUDA(call) \
+    do { \
+        cudaError_t err = (call); \
+        if (err != cudaSuccess) { \
+            std::cerr << "CUDA error at " << __FILE__ << ":" << __LINE__ \
+                      << " code=" << err << " \"" << cudaGetErrorString(err) << "\"" << std::endl; \
+            std::exit(EXIT_FAILURE); \
+        } \
+    } while (0)
 
 __global__ void warmup_kernel(float* data, int N) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -75,7 +87,8 @@ void perf_accuracy(const T* out1, const T* out2, const int total) {
 
     delete[] out_major;
     delete[] out_minor;
-
+    
+    // 二维矩阵析构
     // for (int i = 0; i < rows; ++i) {
     //     delete[] data[i];
     // }

@@ -1,29 +1,57 @@
 # 这是 CMakeLists.txt 文件内容
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.20)
+project(TEST_CUDA LANGUAGES CXX CUDA)
 
-project(cuda_test LANGUAGES CXX CUDA)
-
+# Set C++/CUDA standard
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CUDA_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 
-if(NOT DEFINED ENV{CUDA_HOME})
-  message(WARNING "CUDA_HOME not set, using default.")
-  set(CUDA_HOME "/usr/local/cuda")
-else()
-  set(CUDA_HOME $ENV{CUDA_HOME})
-endif()
+# Set CUDA compiler and host compiler
+set(CMAKE_CXX_COMPILER clang++ CACHE STRING "C++ compiler")
+set(CMAKE_CUDA_COMPILER nvcc)
+set(CMAKE_CUDA_HOST_COMPILER ${CMAKE_CXX_COMPILER})
 
-# 如果未从外部设置 CUDA_ARCHITECTURES，则提供默认值
-if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
-    set(CMAKE_CUDA_ARCHITECTURES 80)
-endif()
-
-file(GLOB_RECURSE SOURCES
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/gem.cu"
+# Compilation flags
+# set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler=-fPIC;-O3;--ptxas-options=-v")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+add_compile_options(
+    "$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=-fPIC;-O3>"
+    "$<$<COMPILE_LANGUAGE:CXX>:-O3>"
 )
-add_executable(cuda_test ${SOURCES})
-target_include_directories(cuda_test 
+
+if(WIN32)
+    add_compile_options(
+        "$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=/MD>"
+    )
+endif()
+
+# Check CUDA_ARCHITECTURES
+if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+    message(FATAL_ERROR "CUDA_ARCHITECTURES is not defined.")
+endif()
+
+# Check CUDA Path
+if (NOT DEFINED CUDA_TOOLKIT_ROOT_DIR)
+    message(FATAL_ERROR "CUDA_PATH is not defined.")
+endif()
+
+include_directories(
+    ${CUDA_TOOLKIT_ROOT_DIR}/include
+)
+
+link_directories(
+    ${CUDA_TOOLKIT_ROOT_DIR}/lib64
+)
+
+# Add source file
+file(GLOB_RECURSE SOURCES
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/gemm.cu"
+)
+add_executable(${EXEC_NAME} ${SOURCES})
+target_include_directories(${EXEC_NAME} 
   PRIVATE 
-    ${CUDA_HOME}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/src/benchmark/include
 )
 

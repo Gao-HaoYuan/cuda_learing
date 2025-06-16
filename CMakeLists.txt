@@ -17,9 +17,15 @@ if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
     set(CMAKE_CUDA_ARCHITECTURES 80)
 endif()
 
-file(GLOB_RECURSE SOURCES "./src/clamp.cu")
+file(GLOB_RECURSE SOURCES
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/gem.cu"
+)
 add_executable(cuda_test ${SOURCES})
-target_include_directories(cuda_test PRIVATE ${CUDA_HOME}/include())
+target_include_directories(cuda_test 
+  PRIVATE 
+    ${CUDA_HOME}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/benchmark/include
+)
 
 add_custom_target(
   copy_database_compile_commands ALL

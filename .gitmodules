@@ -4,3 +4,6 @@
 [submodule "pytorch"]
 	path = pytorch
 	url = git@github.com:pytorch/pytorch.git
+[submodule "Benchmark"]
+	path = Benchmark
+	url = https://github.com/Gao-HaoYuan/Benchmark.git

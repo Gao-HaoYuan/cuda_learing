@@ -52,7 +52,7 @@ file(GLOB_RECURSE SOURCES
 add_executable(${EXEC_NAME} ${SOURCES})
 target_include_directories(${EXEC_NAME} 
   PRIVATE 
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/benchmark/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/Benchmark/include
 )
 
 target_link_libraries(${EXEC_NAME} 

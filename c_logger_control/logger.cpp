@@ -8,22 +8,22 @@
 
 static LogLevel current_log_level = LOG_LEVEL_DEBUG;
 
-const char* log_level_to_color(LogLevel level) {
+const char *log_level_to_color(LogLevel level) {
     switch (level) {
-        case LOG_LEVEL_DEBUG: return "\033[36m";  // 青色
-        case LOG_LEVEL_INFO:  return "\033[32m";  // 绿色
-        case LOG_LEVEL_WARN:  return "\033[33m";  // 黄色
-        case LOG_LEVEL_ERROR: return "\033[31m";  // 红色
+        case LOG_LEVEL_DEBUG: return "\033[36m";   // 青色
+        case LOG_LEVEL_INFO: return "\033[32m";    // 绿色
+        case LOG_LEVEL_WARN: return "\033[33m";    // 黄色
+        case LOG_LEVEL_ERROR: return "\033[31m";   // 红色
         case LOG_LEVEL_FATAL: return "\033[1;31m"; // 加粗红
         default: return "\033[0m";
     }
 }
 
-const char* log_level_to_string(LogLevel level) {
+const char *log_level_to_string(LogLevel level) {
     switch (level) {
         case LOG_LEVEL_DEBUG: return "DEBUG";
-        case LOG_LEVEL_INFO:  return "INFO";
-        case LOG_LEVEL_WARN:  return "WARN";
+        case LOG_LEVEL_INFO: return "INFO";
+        case LOG_LEVEL_WARN: return "WARN";
         case LOG_LEVEL_ERROR: return "ERROR";
         case LOG_LEVEL_FATAL: return "FATAL";
         default: return "UNKNOWN";
@@ -35,22 +35,25 @@ void log_set_level(LogLevel level) {
 }
 
 LogLevel get_log_level_from_env(void) {
-    const char* env = getenv("LOG_LEVEL");
+    const char *env = getenv("LOG_LEVEL");
     if (!env) return LOG_LEVEL_INFO;
 
     if (strcasecmp(env, "DEBUG") == 0) return LOG_LEVEL_DEBUG;
-    if (strcasecmp(env, "INFO")  == 0) return LOG_LEVEL_INFO;
-    if (strcasecmp(env, "WARN")  == 0) return LOG_LEVEL_WARN;
+    if (strcasecmp(env, "INFO") == 0) return LOG_LEVEL_INFO;
+    if (strcasecmp(env, "WARN") == 0) return LOG_LEVEL_WARN;
     if (strcasecmp(env, "ERROR") == 0) return LOG_LEVEL_ERROR;
     if (strcasecmp(env, "FATAL") == 0) return LOG_LEVEL_FATAL;
 
     return LOG_LEVEL_INFO;
 }
 
-void log_internal(LogLevel level, const char* tag,
-                                const char* file, int line,
-                                const char* func,
-                                const char* fmt, ...) {
+void log_internal(LogLevel level,
+                  const char *tag,
+                  const char *file,
+                  int line,
+                  const char *func,
+                  const char *fmt,
+                  ...) {
     if (level < current_log_level) return;
 
     // 时间戳
@@ -60,16 +63,19 @@ void log_internal(LogLevel level, const char* tag,
     char time_buf[20];
     strftime(time_buf, sizeof(time_buf), "%Y-%m-%d %H:%M:%S", &tm_info);
 
-    const char* color = log_level_to_color(level);
-    const char* reset = "\033[0m";
+    const char *color = log_level_to_color(level);
+    const char *reset = "\033[0m";
 
     // 打印日志头
-    fprintf(stderr, "%s[%s] [%s] [%s] [%s:%d %s] ",
-        color,
-        time_buf,
-        log_level_to_string(level),
-        tag ? tag : "NoTag",
-        file, line, func);
+    fprintf(stderr,
+            "%s[%s] [%s] [%s] [%s:%d %s] ",
+            color,
+            time_buf,
+            log_level_to_string(level),
+            tag ? tag : "NoTag",
+            file,
+            line,
+            func);
 
     // 打印正文
     va_list args;

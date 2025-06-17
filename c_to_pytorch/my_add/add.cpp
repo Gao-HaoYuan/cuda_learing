@@ -12,14 +12,12 @@ torch::Tensor my_add(torch::Tensor input) {
     const int grids = (size + blocks - 1) / blocks;
 
     AT_DISPATCH_FLOATING_TYPES(input.scalar_type(), "my_add", ([&] {
-        my_add_cuda(
-            ptr<scalar_t>(input),
-            ptr<scalar_t>(output),
-            size,
-            grids,
-            blocks
-        );
-    }));
+                                   my_add_cuda(ptr<scalar_t>(input),
+                                               ptr<scalar_t>(output),
+                                               size,
+                                               grids,
+                                               blocks);
+                               }));
 
     return output;
 }

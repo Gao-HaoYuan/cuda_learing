@@ -1,6 +1,7 @@
 # 语言: None, Cpp, Java, JavaScript, ObjC, Proto, TableGen, TextProto
 Language: Cpp
 # BasedOnStyle:	LLVM
+BasedOnStyle: Google
 
 # 访问说明符(public、private等)的偏移
 AccessModifierOffset: -4
@@ -52,10 +53,10 @@ AlwaysBreakBeforeMultilineStrings: false
 AlwaysBreakTemplateDeclarations: true
 
 # false表示函数实参要么都在同一行，要么都各自一行
-BinPackArguments: true
+BinPackArguments: false
 
 # false表示所有形参要么都在同一行，要么都各自一行
-BinPackParameters: true
+BinPackParameters: false
 
 # 大括号换行，只有当BreakBeforeBraces设置为Custom时才有效
 BraceWrapping:
@@ -108,7 +109,7 @@ BreakConstructorInitializers: AfterColon
 BreakStringLiterals: false
 
 # 每行字符的限制，0表示没有限制
-ColumnLimit: 0
+ColumnLimit: 80
 
 CompactNamespaces: true
 
@@ -131,7 +132,7 @@ DerivePointerAlignment: false
 FixNamespaceComments: true
 
 # 缩进case标签
-IndentCaseLabels: false
+IndentCaseLabels: true
 
 IndentPPDirectives: None
 
@@ -213,4 +214,4 @@ TabWidth: 4
 UseTab: Never
 
 # 强制所有参数换行
-# AllowAllArgumentsOnNextLine: true
+AllowAllArgumentsOnNextLine: false

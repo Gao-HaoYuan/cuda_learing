@@ -13,7 +13,7 @@ TEST(Strings, Hello) {
     EXPECT_EQ(std::string("he") + "llo", "hello");
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
     std::string filter;
     if (argc > 1 && std::string(argv[1]) == "--filter" && argc > 2) {
         filter = argv[2];

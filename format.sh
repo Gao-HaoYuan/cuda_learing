@@ -1,3 +1,4 @@
 #!/bin/bash
 
-find . -regex '.*\.\(cpp\|hpp\|cu\|c\|h\)' -exec clang-format -style=file -i {} \;
+find . \( -path './pytorch' -o -path './cuda-samples' -o -path './Benchmark' \) -prune -o \
+  -regex '.*\.\(cpp\|hpp\|cu\|c\|h\)' -exec clang-format -style=file -i {} \;

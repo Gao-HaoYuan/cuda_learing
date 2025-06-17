@@ -3,14 +3,18 @@
 
 #include "minitest.hpp"
 
-#define CHECK(call)                                                 \
-    do {                                                            \
-        cudaError_t err = call;                                     \
-        if (err != cudaSuccess) {                                   \
-            fprintf(stderr, "CUDA error in %s (%s:%d): %s\n",       \
-                    #call, __FILE__, __LINE__, cudaGetErrorString(err)); \
-            exit(EXIT_FAILURE);                                     \
-        }                                                           \
+#define CHECK(call)                                                            \
+    do {                                                                       \
+        cudaError_t err = call;                                                \
+        if (err != cudaSuccess) {                                              \
+            fprintf(stderr,                                                    \
+                    "CUDA error in %s (%s:%d): %s\n",                          \
+                    #call,                                                     \
+                    __FILE__,                                                  \
+                    __LINE__,                                                  \
+                    cudaGetErrorString(err));                                  \
+            exit(EXIT_FAILURE);                                                \
+        }                                                                      \
     } while (0)
 
 TEST(CUDA, Check_P2P) {
@@ -22,12 +26,14 @@ TEST(CUDA, Check_P2P) {
 
     for (int device1 = 0; device1 < deviceCount; device1++) {
         for (int device2 = 0; device2 < deviceCount; device2++) {
-            if (device1 == device2)
-                continue;
-            
+            if (device1 == device2) continue;
+
             int canAccessPeer;
             CHECK(cudaDeviceCanAccessPeer(&canAccessPeer, device1, device2));
-            printf("P2P access from device %d to %d: %s\n", device1, device2, canAccessPeer ? "Yes" : "No");
+            printf("P2P access from device %d to %d: %s\n",
+                   device1,
+                   device2,
+                   canAccessPeer ? "Yes" : "No");
         }
         printf("\n");
     }

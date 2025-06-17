@@ -16,22 +16,23 @@
 #pragma once
 #include <cuda_fp16.h>
 #include <torch/extension.h>
-
+// clang-format off
 #define CHECK_CUDA(x) TORCH_CHECK(x.options().device().is_cuda(), #x " must be a CUDA tensor")
 #define CHECK_CONTIGUOUS(x) TORCH_CHECK(x.is_contiguous(), #x " must be contiguous")
 #define CHECK_INPUT(x) CHECK_CUDA(x); CHECK_CONTIGUOUS(x)
+// clang-format on
 
-template<typename U>
+template <typename U>
 struct native_type {
-  using T = U;
+    using T = U;
 };
 
-template<>
+template <>
 struct native_type<c10::Half> {
-  using T = __half;
+    using T = __half;
 };
 
-template<typename U>
-typename native_type<U>::T* ptr(torch::Tensor t) {
-  return reinterpret_cast<typename native_type<U>::T*>(t.data_ptr<U>());
+template <typename U>
+typename native_type<U>::T *ptr(torch::Tensor t) {
+    return reinterpret_cast<typename native_type<U>::T *>(t.data_ptr<U>());
 }

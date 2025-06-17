@@ -1,6 +1,8 @@
 #include <iostream>
 #include <math.h>
 
+#include "minitest.hpp"
+
 // Kernel function to add the elements of two arrays
 __global__ void add_0(int n, float *x, float *y) {
     for (int i = 0; i < n; i++)
@@ -21,7 +23,7 @@ __global__ void add_2(int n, float *x, float *y) {
         y[i] = x[i] + y[i];
 }
 
-int main(void) {
+TEST(CUAD, Add) {
     int N = 1 << 20;
     float *x, *y;
 
@@ -57,5 +59,4 @@ int main(void) {
     // Free memory
     cudaFree(x);
     cudaFree(y);
-    return 0;
 }

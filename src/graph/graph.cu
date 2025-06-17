@@ -1,6 +1,8 @@
 #include <cuda_runtime.h>
 #include <iostream>
 
+#include "minitest.hpp"
+
 // 检查报错
 #define CHECK(call) \
     if ((call) != cudaSuccess) { \
@@ -24,7 +26,7 @@ __global__ void squareKernel(int *data) {
     }
 }
 
-int main() {
+TEST(CUDA, Graph) {
     int *d_data, *h_data;
     cudaMalloc(&d_data, N * sizeof(int));
     h_data = (int*)malloc(N * sizeof(int));
@@ -83,6 +85,4 @@ int main() {
     cudaGraphDestroy(graph);
     cudaGraphExecDestroy(graphExec);
     cudaStreamDestroy(stream);
-
-    return 0;
 }

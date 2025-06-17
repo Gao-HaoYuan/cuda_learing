@@ -1,6 +1,8 @@
 #include <iostream>
 #include <cuda_runtime.h>
 
+#include "minitest.hpp"
+
 void printDeviceProperties() {
     int deviceCount = 0;
     cudaGetDeviceCount(&deviceCount);
@@ -39,7 +41,6 @@ void printDeviceProperties() {
     }
 }
 
-int main() {
+TEST(CUDA, Prop) {
     printDeviceProperties();
-    return 0;
 }

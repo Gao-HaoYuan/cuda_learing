@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <cuda_runtime.h>
 
+#include "minitest.hpp"
+
 #define CHECK(call)                                                 \
     do {                                                            \
         cudaError_t err = call;                                     \
@@ -11,12 +13,11 @@
         }                                                           \
     } while (0)
 
-int main() {
+TEST(CUDA, Check_P2P) {
     int deviceCount = 0;
     CHECK(cudaGetDeviceCount(&deviceCount));
     if (deviceCount < 2) {
         printf("This test requires at least two CUDA-capable devices.\n");
-        return 0;
     }
 
     for (int device1 = 0; device1 < deviceCount; device1++) {
@@ -30,6 +31,4 @@ int main() {
         }
         printf("\n");
     }
-
-    return 0;
 }

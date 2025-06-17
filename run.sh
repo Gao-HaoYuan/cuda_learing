@@ -36,5 +36,6 @@ cmake --build "$BUILD_DIR" -- -j$(nproc)
 # 运行生成的可执行文件（如果存在）
 EXEC_PATH="$BUILD_DIR/$EXEC_NAME"
 echo "---------------------------------------------------------"
-"$EXEC_PATH"
-# ncu --set full --target-processes all -o my_report -f "$EXEC_PATH"
+# "$@" 转发 bash 脚本参数
+"$EXEC_PATH" "$@" 
+# ncu --set full --target-processes all -o my_report -f "$EXEC_PATH" "$@"

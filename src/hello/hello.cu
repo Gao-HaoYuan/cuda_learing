@@ -2,6 +2,8 @@
 #include <cstdio>
 #include <cuda_runtime.h>
 
+#include "minitest.hpp"
+
 __host__ __device__ void say_hello() {
 #ifdef __CUDA_ARCH__
     printf("Hello, world from GPU architecture %d!\n", __CUDA_ARCH__);
@@ -14,9 +16,8 @@ __global__ void kernel() {
     say_hello();
 }
 
-int main() {
+TEST(CUDA, Hello) {
     kernel<<<1, 2>>>();
     cudaDeviceSynchronize();
     say_hello();
-    return 0;
 }

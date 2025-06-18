@@ -48,13 +48,13 @@ link_directories(
 # Add source file
 file(GLOB_RECURSE SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cu"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Benchmark/*.cu"
 )
 add_executable(${EXEC_NAME} ${SOURCES})
 target_include_directories(${EXEC_NAME} 
   PRIVATE 
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
-    ${CMAKE_CURRENT_SOURCE_DIR}/Benchmark/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/include
 )
 
 target_link_libraries(${EXEC_NAME} 

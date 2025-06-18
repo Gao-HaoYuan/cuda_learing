@@ -3,7 +3,7 @@ import torch.profiler
 from torch.profiler import ProfilerActivity
 
 def perf_profile(operator_fn, *args, **kwargs):
-    # 同步 cuda 行为
+    # 同步 cuda 行为, 不执行同步 cuda 统计会出错，比如内存峰值
     def sync_op():
         torch.cuda.synchronize()
         _ = operator_fn(*args, **kwargs)

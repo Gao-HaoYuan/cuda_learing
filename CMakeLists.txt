@@ -61,6 +61,7 @@ target_link_libraries(${EXEC_NAME}
     PRIVATE 
     cudart
     cublas
+    cublasLt
 )
 
 add_custom_target(

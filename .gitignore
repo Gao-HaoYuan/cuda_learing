@@ -1,6 +1,7 @@
 .cache
 .vscode
 build/
+__pycache__
 compile_commands.json
 *.egg-info
 dist

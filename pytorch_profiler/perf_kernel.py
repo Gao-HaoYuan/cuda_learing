@@ -50,3 +50,15 @@ def perf_accuracy(expected, compared):
     for i, (a, b) in enumerate(zip(expected, compared)):
         err, corr = compare(a, b)
         print(f"Output {i}: relative_error_mean {err:.6f}, corr: {corr:.6f}")
+
+
+def measure_step_memory(fn, desc=""):
+    torch.cuda.synchronize()
+    result = fn()
+    torch.cuda.synchronize()
+
+    current = torch.cuda.memory_allocated() / 1024
+    peak = torch.cuda.max_memory_allocated() / 1024
+
+    print(f"[{desc:<12}] Δcurrent mem: {current:.2f} KB; Δpeak mem: {peak:.2f}")
+    return result

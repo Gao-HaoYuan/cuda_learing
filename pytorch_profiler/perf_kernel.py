@@ -15,8 +15,8 @@ def perf_profile(operator_fn, *args, **kwargs):
         activities = [ProfilerActivity.CPU, ProfilerActivity.CUDA],
         schedule = torch.profiler.schedule(wait=1, warmup=1, active=3, repeat=1),
         on_trace_ready = torch.profiler.tensorboard_trace_handler('./log/linear'),
-        # record_shapes = True,
-        # with_stack = True,
+        record_shapes = True,
+        with_stack = True,
         profile_memory = True
     ) as prof:
         for _ in range(5):
@@ -62,3 +62,19 @@ def measure_step_memory(fn, desc=""):
 
     print(f"[{desc:<12}] Δcurrent mem: {current:.2f} KB; Δpeak mem: {peak:.2f}")
     return result
+
+def print_tensor_info(tensor, name="tensor"):
+    if not isinstance(tensor, torch.Tensor):
+        print(f"[{name}] is not a torch.Tensor (type: {type(tensor)})\n")
+        return
+
+    print(f"===== {name} =====")
+    print(f"Type           : {type(tensor)}")
+    print(f"Shape          : {tensor.shape}")
+    print(f"Dtype          : {tensor.dtype}")
+    print(f"Device         : {tensor.device}")
+    print(f"Requires Grad  : {tensor.requires_grad}")
+    print(f"Is Leaf        : {tensor.is_leaf}")
+    print(f"Grad           : {tensor.grad}")
+    print(f"Data (first 5) : {tensor.flatten()[:5].tolist()}")
+    print("====================\n")

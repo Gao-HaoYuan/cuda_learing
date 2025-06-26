@@ -1,3 +1,5 @@
+from typing import Callable
+
 import torch
 import torch.profiler
 from torch.profiler import ProfilerActivity
@@ -52,7 +54,14 @@ def perf_accuracy(expected, compared):
         print(f"Output {i}: relative_error_mean {err:.6f}, corr: {corr:.6f}")
 
 
-def measure_step_memory(fn, desc=""):
+def measure_step_memory(fn: Callable, desc=""):
+    """
+    执行给定的 lambda 表达式或其他可调用对象，测量执行时的显存使用情况。
+
+    参数:
+        fn (Callable): 要执行的函数或 lambda 表达式，例如 lambda: model(input)
+        desc (str): 可选描述，用于标识该步骤
+    """
     torch.cuda.synchronize()
     result = fn()
     torch.cuda.synchronize()

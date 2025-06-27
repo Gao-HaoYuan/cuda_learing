@@ -50,7 +50,12 @@ pytorch profiler 工具，export_stacks 生成空文件，这个是一个 bug，
 参考 issues : [100253](https://github.com/pytorch/pytorch/issues/100253)
 
 <h2> pytorch </h2>
-pytorch 源码
+pytorch 源码， 核心逻辑是：
+
+* Tensor：
+* AutoGrad: pytorch/torch/csrc/autograd
+
+(学习的时候继续补充)
 
 <h2> c_log_control </h2>
 设计一个 log demo，用于 debug 错误，避免反复编译

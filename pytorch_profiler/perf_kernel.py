@@ -40,6 +40,7 @@ def perf_profile(operator_fn, *args, **kwargs):
 
     return output
 
+
 def perf_accuracy(expected, compared):
     def compare(x, y):
         err = torch.mean(torch.abs(x - y)) / torch.mean(torch.abs(x))
@@ -61,16 +62,17 @@ def measure_step_memory(fn: Callable, desc=""):
     参数:
         fn (Callable): 要执行的函数或 lambda 表达式，例如 lambda: model(input)
         desc (str): 可选描述，用于标识该步骤
+
+    TODO: fn() 如果存在返回值，不能直接返回，否则 inplace 操作会额外计算返回张量的内存
     """
     torch.cuda.synchronize()
-    result = fn()
+    fn()
     torch.cuda.synchronize()
 
     current = torch.cuda.memory_allocated() / 1024
     peak = torch.cuda.max_memory_allocated() / 1024
+    print(f"[{desc:<12}] Δcurrent mem: {current:.2f} KB; Δpeak mem: {peak:.2f} KB")
 
-    print(f"[{desc:<12}] Δcurrent mem: {current:.2f} KB; Δpeak mem: {peak:.2f}")
-    return result
 
 def print_tensor_info(tensor, name="tensor"):
     if not isinstance(tensor, torch.Tensor):
@@ -78,12 +80,12 @@ def print_tensor_info(tensor, name="tensor"):
         return
 
     print(f"===== {name} =====")
+    print(f"ptr            : {tensor.data_ptr()}")
     print(f"Type           : {type(tensor)}")
     print(f"Shape          : {tensor.shape}")
     print(f"Dtype          : {tensor.dtype}")
     print(f"Device         : {tensor.device}")
     print(f"Requires Grad  : {tensor.requires_grad}")
     print(f"Is Leaf        : {tensor.is_leaf}")
-    print(f"Grad           : {tensor.grad}")
     print(f"Data (first 5) : {tensor.flatten()[:5].tolist()}")
     print("====================\n")

@@ -55,23 +55,22 @@ def perf_accuracy(expected, compared):
         print(f"Output {i}: relative_error_mean {err:.6f}, corr: {corr:.6f}")
 
 
-def measure_step_memory(fn: Callable, desc=""):
+def measure_step_memory(fn: Callable, desc="", device_id=0):
     """
-    执行给定的 lambda 表达式或其他可调用对象，测量执行时的显存使用情况。
-
+    执行给定的函数，测量指定GPU设备执行时的显存使用情况。
+    
     参数:
-        fn (Callable): 要执行的函数或 lambda 表达式，例如 lambda: model(input)
-        desc (str): 可选描述，用于标识该步骤
-
-    TODO: fn() 如果存在返回值，不能直接返回，否则 inplace 操作会额外计算返回张量的内存
+        fn (Callable): 要执行的函数或 lambda 表达式
+        desc (str): 描述
+        device_id (int): GPU设备号，默认0
     """
-    torch.cuda.synchronize()
+    torch.cuda.synchronize(device_id)
     fn()
-    torch.cuda.synchronize()
+    torch.cuda.synchronize(device_id)
 
-    current = torch.cuda.memory_allocated() / 1024
-    peak = torch.cuda.max_memory_allocated() / 1024
-    print(f"[{desc:<12}] Δcurrent mem: {current:.2f} KB; Δpeak mem: {peak:.2f} KB")
+    current = torch.cuda.memory_allocated(device=device_id) / 1024**2
+    peak = torch.cuda.max_memory_allocated(device=device_id) / 1024**2
+    print(f"[{desc:<12}][GPU{device_id}] Current: {current:.2f} MB; Peak: {peak:.2f} MB")
 
 
 def print_tensor_info(tensor, name="tensor"):

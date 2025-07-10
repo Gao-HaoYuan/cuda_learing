@@ -1,9 +1,6 @@
 [submodule "cuda-samples"]
 	path = cuda-samples
 	url = https://github.com/NVIDIA/cuda-samples.git
-[submodule "pytorch"]
-	path = pytorch
-	url = git@github.com:pytorch/pytorch.git
 [submodule "Benchmark"]
 	path = Benchmark
 	url = https://github.com/Gao-HaoYuan/Benchmark.git

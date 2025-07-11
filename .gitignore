@@ -1,10 +1,12 @@
 .cache
 .vscode
+*.egg-info
+*.so
+dist/
+log/
+data/
 build/
+lib/
 __pycache__
 compile_commands.json
-*.egg-info
-dist
-log
-data
 test.cu

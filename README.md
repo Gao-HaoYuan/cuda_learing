@@ -3,6 +3,8 @@
 
 目前，该文档共描述了三种 C to python module 的方法，三种方法用法都不一样，注意辨别。工作还是以第三种方法为主： [c_to_pytorch](#c_to_pytorch)
 
+<h2> c_cuda_add </h2>
+该 demo 演示了怎么使用 pybind11 写一个基本的 cuda add 的用法
 
 <h2> c_register_kernel </h2>
 该 demo 演示了怎么给 pytorch 注册一个 kernel，在工作中用处应该不会很大，主要结合 pytorch 源码学习。

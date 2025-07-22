@@ -5,6 +5,8 @@
 
 <h2> c_pycuda </h2>
 该 demo 演示了怎么使用 pycuda 调用 kernel，类似的 cupy 也可以写 kernel, 但是没有 pycuda 灵活，numba 使用装饰器 cuda.jit 也可以写 kernel，但是需要根据 numba 的语法来写, numba 的语法就不再展示
+</br></br>
+如果 kernel 的参数是基本数据类型，需要用 np 修饰，或者其他方式修饰，因为 python 的 int/float 是一个类
 
 * 首先需要使用 nvcc 编译生成 ptx/cubin 二进制文件
 ```bash

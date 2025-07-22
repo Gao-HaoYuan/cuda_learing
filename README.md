@@ -4,7 +4,7 @@
 目前，该文档共描述了三种 C to python module 的方法，三种方法用法都不一样，注意辨别。工作还是以第三种方法为主： [c_to_pytorch](#c_to_pytorch)
 
 <h2> c_pycuda </h2>
-该 demo 演示了怎么使用 pycuda 调用 kernel
+该 demo 演示了怎么使用 pycuda 调用 kernel，类似的 cupy 也可以写 kernel, 但是没有 pycuda 灵活，numba 使用装饰器 cuda.jit 也可以写 kernel，但是需要根据 numba 的语法来写, numba 的语法就不再展示
 
 * 首先需要使用 nvcc 编译生成 ptx/cubin 二进制文件
 ```bash

@@ -70,7 +70,7 @@ pytorch 源码， 核心逻辑是：
 * Tensor：
 * AutoGrad: pytorch/torch/csrc/autograd
 * Cublas Handle: pytorch/aten/src/ATen/cuda/CublasHandlePool.cpp
-* pytoch 的部分代码是需要通过 torchgen/ 目录中的文件生成， 生成代码如下;
+* pytoch 的部分代码是需要通过 torchgen/ 目录中的文件生成， 生成指令如下:
     ```python
     PYTHONPATH=$(pwd) python torchgen/gen.py --install_dir build/aten/src
     ```

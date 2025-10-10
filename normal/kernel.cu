@@ -4,6 +4,8 @@
 #include <curand_kernel.h>
 #include <ATen/ATen.h>
 #include <ATen/cuda/CUDAContext.h>
+#include <ATen/cuda/CUDAGeneratorImpl.h>
+
 
 using at::Tensor;
 
@@ -37,6 +39,10 @@ void launch_curand_normal_kernel(at::Tensor out, unsigned long long seed, float 
 
     const int threads = 256;
     const int blocks = std::min<int>((N + threads - 1) / threads, 4096);
+
+    auto gen = at::cuda::detail::getDefaultCUDAGenerator();
+    uint64_t torch_seed = gen.current_seed();
+    printf("torch current seed is %ld\n", torch_seed);
 
     cudaStream_t stream = at::cuda::getCurrentCUDAStream();
 

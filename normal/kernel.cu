@@ -40,11 +40,12 @@ void launch_curand_normal_kernel(at::Tensor out, unsigned long long seed, float 
     const int threads = 256;
     const int blocks = std::min<int>((N + threads - 1) / threads, 4096);
 
-    auto gen = at::cuda::detail::getDefaultCUDAGenerator();
+    at::cuda::CUDAGuard guard(out.device());
+    cudaStream_t stream = at::cuda::getCurrentCUDAStream();
+
+    auto gen = at::cuda::detail::getDefaultCUDAGenerator(); // 不需要显示声明 out.device().index()
     uint64_t torch_seed = gen.current_seed();
     printf("torch current seed is %ld\n", torch_seed);
-
-    cudaStream_t stream = at::cuda::getCurrentCUDAStream();
 
     curand_normal_kernel<<<blocks, threads, 0, stream>>>(
         out.data_ptr<float>(), N, seed, mean, std);

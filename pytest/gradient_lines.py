@@ -56,11 +56,18 @@ class LayerGradPlotter:
             topk_names = sorted(names, key=lambda n: last_grad.get(n, 0.0), reverse=True)[:topk]
             names = topk_names
 
-        # 动态放大图像尺寸
+        # --- 调整字体 ---
+        plt.rcParams.update({
+            "savefig.dpi": 300,
+            "figure.dpi": 200,
+            "font.sans-serif": ["DejaVu Sans"],
+            "text.antialiased": True,
+        })
+
+        # --- 动态放大图像尺寸 ---
         width = max(10, len(names) * 0.4)       # 宽度按层数自动拉伸
         height = 5 + 0.1 * len(self.step_records)  # 每多几条线略增高一点
         fig, ax = plt.subplots(figsize=(width, height))
-
 
         # --- 画折线 ---
         for step, grad_dict in self.step_records:
@@ -90,7 +97,8 @@ class LayerGradPlotter:
         )
 
         # --- 调整边距，让 x 轴文字完全显示 ---
-        plt.subplots_adjust(left=0.08, right=0.80, bottom=0.25, top=0.90)
+        # plt.subplots_adjust(left=0.08, right=0.80, bottom=0.25, top=0.90)
+        fig.tight_layout(rect=[0, 0.05, 1, 1])  # bottom 预留一点余地
 
         # 写入 TensorBoard
         self.writer.add_figure(f"LayerGradientLines/epoch_{epoch}", fig, global_step=epoch)

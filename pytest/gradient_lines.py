@@ -56,19 +56,41 @@ class LayerGradPlotter:
             topk_names = sorted(names, key=lambda n: last_grad.get(n, 0.0), reverse=True)[:topk]
             names = topk_names
 
-        # 画图
-        fig, ax = plt.subplots(figsize=(max(6, len(names) * 0.35), 4.0))
+        # 动态放大图像尺寸
+        width = max(10, len(names) * 0.4)       # 宽度按层数自动拉伸
+        height = 5 + 0.1 * len(self.step_records)  # 每多几条线略增高一点
+        fig, ax = plt.subplots(figsize=(width, height))
+
+
+        # --- 画折线 ---
         for step, grad_dict in self.step_records:
             vals = [grad_dict.get(n, 0.0) for n in names]
             ax.plot(range(len(vals)), vals, marker='o', linewidth=1, label=f"step {step}")
 
+        # --- 坐标轴和网格 ---
         ax.set_xticks(range(len(names)))
-        ax.set_xticklabels(names, rotation=75, ha='right')
-        ax.set_ylabel("Gradient L2-Norm")
-        ax.set_title(f"Layer Gradients — Epoch {epoch}")
+        ax.set_xticklabels(names, rotation=70, ha='right', fontsize=9)
+        ax.set_ylabel("Gradient L2-Norm", fontsize=11)
+        ax.set_title(f"Layer Gradients — Epoch {epoch}", fontsize=12, pad=12)
         ax.grid(axis='y', linestyle='--', alpha=0.3)
-        ax.legend(fontsize=8, loc='best')
-        plt.tight_layout()
+        
+        # --- 图例布局优化 ---
+        # 1) 放到外侧右边，不压主图
+        # 放在右侧外部，自动两列显示
+        ax.legend(
+            fontsize=9,
+            loc='center left',
+            bbox_to_anchor=(1.02, 0.5),
+            borderaxespad=0,
+            frameon=False,
+            ncol=2,                  # ✅ 每行显示两个 legend 条目
+            columnspacing=1.0,       # 列间距
+            handlelength=2.0,        # 线段长度
+            handletextpad=0.6,       # 线段和文字间距
+        )
+
+        # --- 调整边距，让 x 轴文字完全显示 ---
+        plt.subplots_adjust(left=0.08, right=0.80, bottom=0.25, top=0.90)
 
         # 写入 TensorBoard
         self.writer.add_figure(f"LayerGradientLines/epoch_{epoch}", fig, global_step=epoch)

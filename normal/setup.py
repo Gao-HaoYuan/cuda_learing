@@ -4,6 +4,8 @@ import torch
 from setuptools import setup
 from torch.utils.cpp_extension import BuildExtension, CUDAExtension
 
+os.environ.setdefault("TORCH_CUDA_ARCH_LIST", "8.6")  # 按你的卡改
+
 setup(
     name="AFP",
     ext_modules=[

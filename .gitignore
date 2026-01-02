@@ -1,5 +1,6 @@
 .cache
 .vscode
+.history
 *.egg-info
 *.so
 dist/

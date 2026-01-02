@@ -8,7 +8,7 @@ setup(
             name='cublaslt_gemm',
             sources=[
                 'register.cpp',  # 上面的 pybind11 接口文件
-                'witin_cublaslt.cpp'  # 你的 CublasLtGemmRunner 实现
+                'blas_gemm.cpp'  # 你的 CublasLtGemmRunner 实现
             ],
             extra_compile_args={
                 'cxx': ['-O3', '-std=c++17'],

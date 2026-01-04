@@ -101,5 +101,5 @@ private:
     cublasLtMatmulHeuristicResult_t best_algo_{};
 
     // default col-major layout order
-    constexpr cublasLtOrder_t order_{CUBLASLT_ORDER_COL};
+    const cublasLtOrder_t order_{CUBLASLT_ORDER_COL};
 };

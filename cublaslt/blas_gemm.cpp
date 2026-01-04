@@ -5,6 +5,7 @@
 
 #include "blas_gemm.h"
 #include "workspace.h"
+#include "blas_handle.h"
 
 template <typename T>
 static inline int64_t ld_major(int64_t rows, int64_t cols /*COL MAJOR*/) {
@@ -22,8 +23,8 @@ CublasLtGemm<T>::CublasLtGemm(
     opA_(opA), opB_(opB), 
     stream_(stream)
 {
-    // lt_ = at::cuda::getCurrentCUDABlasHandle();
-    CHECK_LT(cublasLtCreate(&lt_handle_));
+    // lt_ = at::cuda::getCurrentCUDABlasLtHandle();
+    lt_handle_ = getBlasLtHandle();
     create_descriptors_();
     select_algo_();
 }
@@ -35,7 +36,6 @@ CublasLtGemm<T>::~CublasLtGemm() {
     if (layoutB_) cublasLtMatrixLayoutDestroy(layoutB_);
     if (layoutA_) cublasLtMatrixLayoutDestroy(layoutA_);
     if (matmul_desc_) cublasLtMatmulDescDestroy(matmul_desc_);
-    if (lt_handle_) cublasLtDestroy(lt_handle_);
 
     // c10::cuda::CUDACachingAllocator::raw_delete(workspace_ptr_);
 }

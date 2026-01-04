@@ -12,7 +12,8 @@ using at::Tensor;
 __global__ void curand_normal_kernel(
     float* __restrict__ out,
     int64_t N,
-    unsigned long long seed,
+    uint64_t seed,
+    uint64_t offset,
     float mean,
     float std)
 {
@@ -21,7 +22,7 @@ __global__ void curand_normal_kernel(
 
     // 每个线程独立的 RNG 状态
     curandStatePhilox4_32_10_t state;
-    curand_init(seed, tid, 0, &state);  // (seed, sequence, offset, state)
+    curand_init(seed, tid, offset, &state);  // (seed, sequence, offset, state)
 
     for (int64_t i = tid; i < N; i += stride) {
         float r = curand_normal(&state); // mean=0, std=1
@@ -43,12 +44,17 @@ void launch_curand_normal_kernel(at::Tensor out, unsigned long long seed, float 
     at::cuda::CUDAGuard guard(out.device());
     cudaStream_t stream = at::cuda::getCurrentCUDAStream();
 
-    auto gen = at::cuda::detail::getDefaultCUDAGenerator(); // 不需要显示声明 out.device().index()
-    uint64_t torch_seed = gen.current_seed();
+    auto* gen_impl = at::get_generator_or_default<at::CUDAGeneratorImpl>(
+        std::nullopt, 
+        at::cuda::detail::getDefaultCUDAGenerator()
+    );
+    auto philox = gen_impl->philox_cuda_state(numel);
+    uint64_t seed   = philox.seed_.val;
+    uint64_t offset = philox.offset_.val;
     printf("torch current seed is %ld\n", torch_seed);
 
     curand_normal_kernel<<<blocks, threads, 0, stream>>>(
-        out.data_ptr<float>(), N, seed, mean, std);
+        out.data_ptr<float>(), N, seed, offset, mean, std);
 
     AT_CUDA_CHECK(cudaGetLastError());
 }

@@ -46,18 +46,25 @@ __global__ void mean_strided_kernel(
     }
 
     // 3) block 内在 y 方向（threadIdx.y）做归约
-    extern __shared__ unsigned char smem_raw[]; // 足够小的共享内存
-    acc_t* smem = reinterpret_cast<acc_t*>(smem_raw);
-    int lane = threadIdx.y;
-    smem[threadIdx.x * blockDim.y + lane] = sum;
+    extern __shared__ float smem[];
+    int tx = threadIdx.x;
+    int ty = threadIdx.y;
+    int bdx = blockDim.x;
+    int bdy = blockDim.y;
+
+    smem[ty * bdx + tx] = sum;
     __syncthreads();
 
-    // 简单串行归约（blockDim.y 一般不大）
-    if (lane == 0) {
-        acc_t s = acc_t(0);
-        for (int t = 0; t < blockDim.y; ++t) {
-            s += smem[threadIdx.x * blockDim.y + t];
+    for (int stride = bdy >> 1; stride > 0; stride >>= 1) {
+        if (ty < stride) {
+            smem[ty * bdx + tx] += smem[(ty + stride) * bdx + tx];
         }
+        __syncthreads();
+    }
+
+    // 简单串行归约（blockDim.y 一般不大）
+    if (ty == 0) {
+        acc_t s = smem[tx];
         y[out_idx] = static_cast<scalar_t>(s / static_cast<acc_t>(reduce_elems));
     }
 }

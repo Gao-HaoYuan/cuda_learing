@@ -6,23 +6,24 @@
 #include <ATen/cuda/CUDAContext.h>
 #include <ATen/cuda/CUDAGeneratorImpl.h>
 
+// at::cuda::philox::unpack 头文件
+#include <ATen/cuda/PhiloxUtils.cuh>
+
 
 using at::Tensor;
 
 __global__ void curand_normal_kernel(
     float* __restrict__ out,
-    int64_t N,
-    uint64_t seed,
-    uint64_t offset,
-    float mean,
-    float std)
-{
+    at::PhiloxCudaState philox,
+    float mean, float std, int64_t N,
+) {
     int64_t tid = blockIdx.x * blockDim.x + threadIdx.x;
     int64_t stride = blockDim.x * gridDim.x;
 
     // 每个线程独立的 RNG 状态
+    auto [seed, offset] = at::cuda::philox::unpack(philox);
     curandStatePhilox4_32_10_t state;
-    curand_init(seed, tid, offset, &state);  // (seed, sequence, offset, state)
+    curand_init(seed, tid, offset, &state); // (seed, sequence, offset, state)
 
     for (int64_t i = tid; i < N; i += stride) {
         float r = curand_normal(&state); // mean=0, std=1
@@ -49,12 +50,11 @@ void launch_curand_normal_kernel(at::Tensor out, unsigned long long seed, float 
         at::cuda::detail::getDefaultCUDAGenerator()
     );
     auto philox = gen_impl->philox_cuda_state(numel);
-    uint64_t seed   = philox.seed_.val;
-    uint64_t offset = philox.offset_.val;
+
     printf("torch current seed is %ld\n", torch_seed);
 
     curand_normal_kernel<<<blocks, threads, 0, stream>>>(
-        out.data_ptr<float>(), N, seed, offset, mean, std);
+        out.data_ptr<float>(), philox, mean, std, N);
 
     AT_CUDA_CHECK(cudaGetLastError());
 }

@@ -47,7 +47,7 @@ CublasLtGemm<T>::~CublasLtGemm() {
 
 template <typename T>
 void CublasLtGemm<T>::create_descriptors_() {
-    CHECK_LT(cublasLtMatmulDescCreate(&matmul_desc_, Traits::kComputeType, Traits::kDataType));
+    CHECK_LT(cublasLtMatmulDescCreate(&matmul_desc_, Traits::kComputeType, Traits::kScaleType));
     CHECK_LT(cublasLtMatmulDescSetAttribute(matmul_desc_, CUBLASLT_MATMUL_DESC_TRANSA, &opA_, sizeof(opA_)));
     CHECK_LT(cublasLtMatmulDescSetAttribute(matmul_desc_, CUBLASLT_MATMUL_DESC_TRANSB, &opB_, sizeof(opB_)));
 

@@ -3,7 +3,12 @@
 #include <cuda_runtime.h>
 #include <cublasLt.h>
 #include <stdexcept>
-#include <string>
+#include <torch/version.h>
+
+#define TORCH_VERSION_GE(maj, min, pat) \
+    ((TORCH_VERSION_MAJOR > (maj)) || \
+    (TORCH_VERSION_MAJOR == (maj) && TORCH_VERSION_MINOR > (min)) || \
+    (TORCH_VERSION_MAJOR == (maj) && TORCH_VERSION_MINOR == (min) && TORCH_VERSION_PATCH >= (pat)))
 
 inline const char* cublaslt_status_to_string(cublasStatus_t s) {
     switch (s) {

@@ -38,6 +38,7 @@ CublasLtGemm<T>::~CublasLtGemm() {
     if (matmul_desc_) cublasLtMatmulDescDestroy(matmul_desc_);
 
     // c10::cuda::CUDACachingAllocator::raw_delete(workspace_ptr_);
+    // if (lt_handle_) cublasLtDestroy(lt_handle_);
 }
 
 template <typename T>
@@ -116,6 +117,7 @@ void CublasLtGemm<T>::select_algo_() {
     }
 
     throw std::runtime_error("cuBLASLt failed to find any suitable algorithm.");
+    // void* ptr = at::cuda::CUDACachingAllocator::raw_alloc(size);
     // c10::cuda::CUDACachingAllocator::raw_delete(workspace_ptr_);
 }
 
@@ -195,4 +197,5 @@ void CublasLtGemm<T>::run_with_bias(
 
 template class CublasLtGemm<float>;
 template class CublasLtGemm<double>;
-template class CublasLtGemm<c10::Half>;
+template class CublasLtGemm<at::Half>;
+template class CublasLtGemm<at::BFloat16>;

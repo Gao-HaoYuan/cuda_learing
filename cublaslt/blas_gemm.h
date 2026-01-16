@@ -11,7 +11,7 @@ struct CublasLtTraits;
 template <>
 struct CublasLtTraits<float> {
     static constexpr cudaDataType_t kDataType = CUDA_R_32F;
-    static constexpr cublasComputeType_t kComputeType = CUBLAS_COMPUTE_32F_FAST_TF32;
+    static constexpr cublasComputeType_t kComputeType = CUBLAS_COMPUTE_32F_FAST_16F;
 };
 
 template <>
@@ -21,8 +21,14 @@ struct CublasLtTraits<double> {
 };
 
 template <>
-struct CublasLtTraits<c10::Half> {
+struct CublasLtTraits<at::Half> {
     static constexpr cudaDataType_t kDataType = CUDA_R_16F;
+    static constexpr cublasComputeType_t kComputeType = CUBLAS_COMPUTE_32F;
+};
+
+template <>
+struct CublasLtTraits<at::BFloat16> {
+    static constexpr cudaDataType_t kDataType = CUDA_R_16BF;
     static constexpr cublasComputeType_t kComputeType = CUBLAS_COMPUTE_32F;
 };
 

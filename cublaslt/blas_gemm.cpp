@@ -22,9 +22,13 @@ CublasLtGemm<T>::CublasLtGemm(
 ) : M_(M), N_(N), K_(K), 
     opA_(opA), opB_(opB), 
     stream_(stream)
-{
-    // lt_ = at::cuda::getCurrentCUDABlasLtHandle();
+{ 
+#if TORCH_VERSION_GE(2, 4, 0)
+    // 使用 torch 的 handle
+    lt_handle_ = at::cuda::getCurrentCUDABlasLtHandle();
+#else
     lt_handle_ = getBlasLtHandle();
+#endif
     create_descriptors_();
     select_algo_();
 }

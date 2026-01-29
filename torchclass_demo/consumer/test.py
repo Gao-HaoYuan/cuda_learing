@@ -13,3 +13,5 @@ print("x =", x)
 print("w =", w)
 print("x.grad =", x.grad)
 print("w.grad =", w.grad)
+
+print("real out:", x*w + 7)

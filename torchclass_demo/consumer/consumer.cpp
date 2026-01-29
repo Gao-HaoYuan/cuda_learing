@@ -65,12 +65,13 @@ infer_by_producer_so(
     stack.emplace_back(w);
 
     disp.callBoxed(op_infer, &stack);
+    std::cout << "callBoxed return size is:" << nret << std::endl;
 
     if (stack.empty() || !stack.back().isTensor())
         throw std::runtime_error("infer did not return Tensor");
 
     // 5) return safe tensor
-    return stack.back().toTensor().contiguous().clone();
+    return stack[0].toTensor().contiguous().clone();
 }
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {

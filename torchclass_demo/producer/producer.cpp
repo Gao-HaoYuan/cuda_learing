@@ -10,16 +10,16 @@ struct MyState : torch::CustomClassHolder {
 };
 
 // --------- 核心计算：y = x * w + (state.bias) ---------
-static torch::Tensor infer_cpu_impl(const c10::intrusive_ptr<MyState>& st, torch::Tensor x, torch::Tensor w) {
+static std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> infer_cpu_impl(const c10::intrusive_ptr<MyState>& st, torch::Tensor x, torch::Tensor w) {
     // 简单起见：都放 CPU 上算
     x = x.contiguous();
     w = w.contiguous();
     auto y = x * w + st->bias;
-    return y;
+    return {y, x, w};
 }
 
 // --------- Autograd：forward 调用 infer_cpu_impl，backward 返回 dx, dw ---------
-static torch::Tensor infer_autograd_impl(const c10::intrusive_ptr<MyState>& st, torch::Tensor x, torch::Tensor w) {
+static std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> infer_autograd_impl(const c10::intrusive_ptr<MyState>& st, torch::Tensor x, torch::Tensor w) {
     printf("infer by autograd\n");
     return infer_cpu_impl(st, x, w);
 }
@@ -36,7 +36,7 @@ TORCH_LIBRARY(producer, m) {
     m.def("make_state(int bias) -> __torch__.torch.classes.producer.MyState");
 
     // op：infer(state, x, w) -> y
-    m.def("infer(__torch__.torch.classes.producer.MyState state, Tensor x, Tensor w) -> Tensor");
+    m.def("infer(__torch__.torch.classes.producer.MyState state, Tensor x, Tensor w) -> (Tensor, Tensor, Tensor)");
 }
 
 // make_state 的实现（CPU）
